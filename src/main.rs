@@ -7,10 +7,13 @@ const WIDTH: i32 = 800;
 const HEIGHT: i32 = 600;
 const CLOTH_WIDTH: i32 = 20;
 const CLOTH_HEIGHT: i32 = 20;
-const CLOTH_SPACING: i32 = 10;
+const CLOTH_SPACING: i32 = 15;
 
 fn main() -> Result<(), String> {
-    let win_config = WindowConfig::new().size(WIDTH, HEIGHT).vsync(true);
+    let win_config = WindowConfig::new()
+        .size(WIDTH, HEIGHT)
+        .title("Cloth simulation")
+        .vsync(true);
 
     notan::init_with(setup)
         .add_config(win_config)
@@ -36,15 +39,15 @@ fn setup() -> State {
             CLOTH_SPACING,
             WIDTH / 2 - CLOTH_WIDTH * CLOTH_SPACING,
             HEIGHT / 10,
-            10.0,
+            7.0,
         ),
         Cloth::new(
             CLOTH_WIDTH,
             CLOTH_HEIGHT,
             CLOTH_SPACING,
-            WIDTH / 2 - CLOTH_WIDTH * CLOTH_SPACING + 200,
+            WIDTH / 2 - CLOTH_WIDTH * CLOTH_SPACING + 300,
             HEIGHT / 10,
-            10.0,
+            7.0,
         ),
     ];
     State {

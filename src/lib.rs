@@ -8,7 +8,8 @@ use notan::prelude::{Color, Mouse};
 pub mod math;
 
 const GRAVITY: Vector2 = Vector2 { x: 0.0, y: 981.0 };
-const CURSOR_RADIUS: f64 = 10.0;
+const CURSOR_RADIUS: f64 = 16.0;
+const FORCE_MULTIPLIER: f64 = 7000.0;
 
 pub trait Render {
     fn render(&self, draw: &mut Draw);
@@ -106,7 +107,7 @@ impl Cloth {
                         diff.x.clamp(-self.elasticity, self.elasticity),
                         diff.y.clamp(-self.elasticity, self.elasticity),
                     );
-                    force += clamped * 10000.0;
+                    force += clamped * FORCE_MULTIPLIER
                 } else if mouse.right_is_down() {
                     point.break_sticks();
                 }
