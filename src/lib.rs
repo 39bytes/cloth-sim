@@ -22,7 +22,14 @@ pub struct Cloth {
 }
 
 impl Cloth {
-    pub fn new(width: i32, height: i32, spacing: i32, start_x: i32, start_y: i32) -> Self {
+    pub fn new(
+        width: i32,
+        height: i32,
+        spacing: i32,
+        start_x: i32,
+        start_y: i32,
+        elasticity: f64,
+    ) -> Self {
         let mut points = Vec::new();
         let mut sticks = Vec::new();
 
@@ -40,6 +47,7 @@ impl Cloth {
                         Rc::clone(&point),
                         Rc::clone(left_point),
                         spacing as f64,
+                        elasticity,
                     )));
                     left_point.borrow_mut().add_stick(Rc::clone(&stick), 0);
                     point.borrow_mut().add_stick(Rc::clone(&stick), 0);
@@ -54,6 +62,7 @@ impl Cloth {
                         Rc::clone(&point),
                         Rc::clone(up_point),
                         spacing as f64,
+                        elasticity,
                     )));
 
                     up_point.borrow_mut().add_stick(Rc::clone(&stick), 1);
@@ -74,7 +83,7 @@ impl Cloth {
             points,
             sticks,
             drag: 0.05,
-            elasticity: 10.0,
+            elasticity,
         }
     }
 
@@ -83,7 +92,7 @@ impl Cloth {
             let mut point = point.borrow_mut();
 
             // Check if the point is within the mouse's selection radius
-            // Uses the square of the magnitude instead of distance for performance reasons
+            // Uses the square of the magnitude instead of distance since sqrt is expensive
             let dist_sq = (point.position - Vector2::from(mouse.position())).magnitude_squared();
             let selected = dist_sq <= CURSOR_RADIUS * CURSOR_RADIUS;
 
@@ -206,16 +215,21 @@ struct Stick {
     p1: Rc<RefCell<Point>>,
     p2: Rc<RefCell<Point>>,
     length: f64,
+    elasticity: f64,
     selected: bool,
     broken: bool,
 }
 
 impl Stick {
-    fn new(p1: Rc<RefCell<Point>>, p2: Rc<RefCell<Point>>, length: f64) -> Self {
+    fn new(p1: Rc<RefCell<Point>>, p2: Rc<RefCell<Point>>, length: f64, elasticity: f64) -> Self {
+        // Elasticity should be greater than 0 since its the percent of the length
+        // that the stick can stretch before breaking.
+        assert!(elasticity >= 0.0);
         Stick {
             p1,
             p2,
             length,
+            elasticity,
             selected: false,
             broken: false,
         }
@@ -228,6 +242,12 @@ impl Stick {
 
             let diff = p1.position - p2.position;
             let dist = diff.magnitude();
+
+            // Break the stick if it stretches too much
+            if dist > self.length * (1.0 + self.elasticity) {
+                self.broken = true;
+            }
+
             let diff_factor = (self.length - dist) / dist;
             diff * diff_factor * 0.5
         };

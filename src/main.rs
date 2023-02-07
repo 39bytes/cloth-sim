@@ -27,6 +27,8 @@ struct State {
 }
 
 fn setup() -> State {
+    // Initialize the state
+    // Instantiate cloths here
     let cloths = vec![
         Cloth::new(
             CLOTH_WIDTH,
@@ -34,6 +36,7 @@ fn setup() -> State {
             CLOTH_SPACING,
             WIDTH / 2 - CLOTH_WIDTH * CLOTH_SPACING,
             HEIGHT / 10,
+            10.0,
         ),
         Cloth::new(
             CLOTH_WIDTH,
@@ -41,6 +44,7 @@ fn setup() -> State {
             CLOTH_SPACING,
             WIDTH / 2 - CLOTH_WIDTH * CLOTH_SPACING + 200,
             HEIGHT / 10,
+            10.0,
         ),
     ];
     State {
